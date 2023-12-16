@@ -1,30 +1,35 @@
 const http = require("http");
+const fs = require("fs");
+const { dirname } = require("path");
 const server = http.createServer((req, res) => {
   const url = req.url;
+  const method = req.method;
+  let dataMessage = fs.readFileSync(`./message.txt`, "utf8");
+  console.log(dataMessage);
   if (url === "/") {
     res.write("<html>");
+    res.write(`<body><h1>${dataMessage}</h1></body>`);
     res.write("<header><title>My First Page</title></header>");
-    res.write("<body><h1>Hello from my Node.js</h1></body>");
+    res.write(
+      "<body><form action='/message' method='POST'><input type='text' name='message'><button type='submit'>submit</button></form></body>"
+    );
     res.write("</html>");
-    res.end();
-  } else if (url === "/home") {
-    res.write("<html>");
-    res.write("<header><title>My First Page</title></header>");
-    res.write("<body><h1>Wlcome Home</h1></body>");
-    res.write("</html>");
-    res.end();
-  } else if (url === "/about") {
-    res.write("<html>");
-    res.write("<header><title>My First Page</title></header>");
-    res.write("<body><h1>welcome to About Page</h1></body>");
-    res.write("</html>");
-    res.end();
-  } else if (url === "/node") {
-    res.write("<html>");
-    res.write("<header><title>My First Page</title></header>");
-    res.write("<body><h1>Welcome to Node.js Project</h1></body>");
-    res.write("</html>");
-    res.end();
+    return res.end();
+  }
+  if (url === "/message" && method === "POST") {
+    const body = [];
+    req.on("data", (chunk) => {
+      body.push(chunk);
+    });
+    return req.on("end", () => {
+      const parsedBody = Buffer.concat(body).toString();
+      const message = parsedBody.split("=")[1];
+      fs.writeFile("message.txt", message, () => {
+        res.statusCode = 302;
+        res.setHeader("Location", "/");
+        return res.end();
+      });
+    });
   }
 });
 server.listen(3000);
