@@ -5,11 +5,12 @@
   "main": "FirstNodeJs.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon FirstNodeJs"
+    "start": "nodemon FirstNodeJs.js"
   },
   "author": "Feroz shaik",
   "license": "ISC",
   "dependencies": {
+    "express": "^4.18.2",
     "nodemon": "^3.0.2"
   }
 }
